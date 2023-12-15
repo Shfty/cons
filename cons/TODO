@@ -1,0 +1,46 @@
+Features
+========
+ConsArray format trait
+    Need a way to calculate the maximum CharImage width / height for an array column / row
+    Need a way to supply fixed widths / heights (depending on column-major / row-major) for each child of a LinearCell
+        Would this be best encoded in the children themselves by wrapping in Padding?
+    Support for styled header row via CharImage function
+
+Generic implementation for ConsTree
+    Need to invoke Generic on child structs recursively
+    Use attribute tags on members that should be expanded
+    May need to replace existing Generic derive macro with an attribute macro
+        Macro attributes inside structs are illegal, so parsing them as custom syntax is the only option
+        Strip out custom attributes so code emitted for final compile is valid
+
+Implement NamedGeneric derive for AList / PList
+    Perhaps GenericList / GenericAList / GenericPList is a better setup?
+
+Proper list macro implementation with support for list![1, 2, 3, 4, 5] and list![123; 5] forms
+
+Polish
+======
+ConsList collection method coverage
+    Model after Vec / Slice (be wary of duplicating homogenous-specific functionality that can be achieved via mut_slice)
+        dedup (by type, by value?)
+        drain -> sculpt
+        retain -> (can split into retain, retain_mut, into_retain to allow sculpting by predicate. but, will need to be able to map heterogeneously)
+        splice
+
+        as_chunks -> (some sort of like method that returns a new ConsList of tuples by type-level chunk size?)
+        array_windows -> (some sort of like method that returns a new ConsList of tuples by type-level window size?)
+        clone_from_slice -> clone_from (vs another ConsList of the same signature)
+        copy_from_slice -> copy_from (vs another ConsList of the same signature)
+        concat -> foldl / foldr
+        contains -> (ConsListFind trait, but returning a bool instead of a value)
+        copy_within -> (some sort of like method that returns a new ConsList with the specific range overwritten)
+        ends_with -> (vs another ConsList)
+        first / last -> (some sort of convenience wrapper to avoid needing an index for existing traits?)
+        get
+        get_unchecked
+        repeat
+        rotate_left
+        rotate_right
+        swap
+
+Add, Sub, etc. implementations for Position, Direction, Offset to replace manual invocations

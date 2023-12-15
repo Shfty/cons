@@ -1,0 +1,11 @@
+[workspace]
+
+members = [
+    "cons",
+    "cons_proc_macros",
+    "cons_char_image",
+    "char_framebuffer",
+    "deebs",
+    "task_graph",
+    "antigen"
+]

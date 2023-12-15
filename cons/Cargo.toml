@@ -1,0 +1,13 @@
+[package]
+name = "cons"
+version = "0.1.0"
+authors = ["Josh Palmer <jpalmerwatkins@gmail.com>"]
+edition = "2018"
+
+[features]
+default = ["futures"]
+
+[dependencies]
+typenum = "1.12.0"
+cons_proc_macros = { path = "../cons_proc_macros" }
+futures = { version = "0.3.13", optional = true }

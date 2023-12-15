@@ -1,0 +1,11 @@
+[package]
+name = "char_framebuffer"
+version = "0.1.0"
+authors = ["Josh Palmer <jpalmerwatkins@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cons = { path = "../cons" }
+typenum = "1.12.0"

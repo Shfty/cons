@@ -1,0 +1,65 @@
+-- Database --
+Investigate async RwLock / Mutex integration
+    Tricky given that the existing lock functionality is inside traits, which can't be async
+    Can move trait methods back into associated functions in their own impl blocks
+        But, this brings back the issue of excessive function arguments
+        Could this be done by creating a struct or enum to store the generic params, then impl-ing over that and taking a database reference instead of self?
+
+Fix view key iteration
+    Putting RwLocks around the views has complicated this
+    Ideally don't want any allocation when querying
+    Simplest solution is to provide access to view RwLock, have mapper traits unlock it and fetch key iterator
+
+Properly generalize view handling
+    Rework View into a trait over RwLock<ViewKeys> or RwLock<Vec<Key>>
+    Replace any library-side uses of the View type alias
+
+Proper strata for implementing functions that are generic over a database with a given view
+    Need to figure out some way to hide the numerous map function trait constraints from the user's implementation
+        May be able to unify under DatabaseMappable / DatabaseMappableMut traits
+
+Clean up implementation
+    Reduce code repetition as much as possible
+        Can table guard wrapper traits be removed in favor of using read/write guards directly?
+        Encode as much information as possible via associated type constraints (should reduce where clauses)
+        Clean up unused associated types
+        Bigger picture: Can ConsList traits be written in a pure generic style using associated types?
+            i.e. impl<T> Thing for T where T: ConsCell<CAR = Foo, CDR = Bar>
+
+-- Execution --
+Now async fn has been generalized over, need to stratify task graph hierarchy
+    Will need sync / async wrappers for AsyncFnConsList that correspond to SyncFutures / AsyncFutures
+
+Thinking ahead, it would be useful to abstract over async functions of other arities
+    Plan is to encode ECS systems as:
+        async fn(key, ref_row, mut_row) {
+            
+        }
+        
+        and
+
+        async fn(key, ref_row) {
+
+        }
+    
+    The idea being that the ref_row / mut_row types can provide a signature for automatic sculpting
+    Also possibilities for further automation, such as generating a database type that can be instantiated with Default
+
+Clean up implementation
+    SyncFutures / AsyncFutures are almost identical, need to merge them into a FutureConsListPoller or somesuch
+
+-- Rendering --
+Once database is working, investigate rendering query results with egui or imgui-rs
+
+-- R&D --
+Implement pong demo as per Godot ECS
+
+Investigate struct / trait driven abstraction for task graph
+    Lack of async traits is a problem
+        async_trait crate a possibility, but it uses dyn and is therefore not preferable
+    Can wrap a trait method using a generic free function
+        But, that precludes tasks from doing any async work
+    Possible to use macros to embody a 'meta trait'
+        a.k.a. assume an associated function exists on a given type and let the compiler explain the rest
+        This seems like the best solution for functionality, since tasks can then do async things
+    There may be some async pattern that can help with this
